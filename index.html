@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DFW Prebook Parking Helper</title>
+  <style>
+    :root{
+      --bg: #0b1020;
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.72);
+      --muted2: rgba(255,255,255,0.62);
+      --border: rgba(255,255,255,0.14);
+      --shadow: 0 18px 45px rgba(0,0,0,0.35);
+      --radius: 18px;
+      --accent: #7dd3fc;
+      --accent2: #a78bfa;
+      --good: #86efac;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(1000px 600px at 10% 10%, rgba(167,139,250,0.20), transparent 55%),
+                  radial-gradient(900px 600px at 90% 20%, rgba(125,211,252,0.18), transparent 55%),
+                  radial-gradient(900px 600px at 50% 90%, rgba(134,239,172,0.12), transparent 55%),
+                  var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    .container { width: min(1120px, 92vw); margin: 0 auto; }
+
+    header {
+      padding: 18px 0;
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(10px);
+      background: rgba(11,16,32,0.60);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      z-index: 10;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+    .logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(125,211,252,0.9), rgba(167,139,250,0.9));
+      box-shadow: 0 10px 28px rgba(0,0,0,0.35);
+    }
+    .navlinks {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .navlinks a {
+      font-size: 14px;
+      color: var(--muted);
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+    }
+    .navlinks a:hover {
+      color: var(--text);
+      border-color: rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+    }
+
+    .hero { padding: 56px 0 22px; }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.06));
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-left {
+      padding: 26px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-left:before{
+      content:"";
+      position:absolute;
+      inset:-120px -60px auto auto;
+      width: 240px;
+      height: 240px;
+      background: radial-gradient(circle at 30% 30%, rgba(125,211,252,0.28), transparent 60%),
+                  radial-gradient(circle at 70% 70%, rgba(167,139,250,0.22), transparent 60%);
+      filter: blur(2px);
+      transform: rotate(12deg);
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(28px, 4.2vw, 44px);
+      line-height: 1.12;
+      letter-spacing: 0.2px;
+    }
+    .subtitle {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 16px;
+      max-width: 60ch;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 10px;
+      align-items: center;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      font-weight: 650;
+      cursor: pointer;
+      user-select: none;
+      transition: transform .05s ease, background .15s ease, border-color .15s ease;
+      font-size: 14px;
+    }
+    .btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.20); }
+    .btn:active { transform: translateY(1px); }
+
+    .btn-primary {
+      border-color: rgba(125,211,252,0.38);
+      background: linear-gradient(135deg, rgba(125,211,252,0.22), rgba(167,139,250,0.18));
+    }
+    .btn-primary:hover { border-color: rgba(125,211,252,0.55); }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 999px; background: var(--accent); }
+    .dot.purple { background: var(--accent2); }
+    .dot.green { background: var(--good); }
+
+    .hero-right {
+      padding: 18px;
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+    .mini {
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+    }
+    .mini h3 { margin: 0 0 6px; font-size: 15px; }
+    .mini p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    section { padding: 22px 0; }
+    .section-title {
+      font-size: 20px;
+      margin: 0 0 12px;
+      letter-spacing: 0.2px;
+    }
+    .grid3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .grid2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+    .tile {
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+    }
+    .tile h4 { margin: 0 0 8px; font-size: 15px; }
+    .tile p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    /* Video */
+    .video-card {
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+    }
+    .video-wrap {
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.25);
+    }
+    video { width: 100%; height: auto; display: block; }
+    .caption {
+      margin: 10px 0 0;
+      color: var(--muted2);
+      font-size: 13px;
+    }
+
+    /* Chatbot */
+    .chat-card {
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+    }
+    .chat-top {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .chat-top .hint { color: var(--muted2); font-size: 13px; }
+    .chatbox {
+      height: 280px;
+      overflow-y: auto;
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(11,16,32,0.55);
+      border: 1px solid rgba(255,255,255,0.10);
+    }
+    .msg {
+      max-width: 82%;
+      padding: 10px 12px;
+      border-radius: 14px;
+      margin: 8px 0;
+      font-size: 14px;
+      border: 1px solid rgba(255,255,255,0.10);
+      white-space: pre-wrap;
+    }
+    .bot {
+      background: rgba(255,255,255,0.07);
+      border-top-left-radius: 6px;
+    }
+    .you {
+      background: linear-gradient(135deg, rgba(125,211,252,0.18), rgba(167,139,250,0.14));
+      margin-left: auto;
+      border-top-right-radius: 6px;
+    }
+
+    .chat-input {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    input[type="text"], input[type="number"], select{
+      width: 100%;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      outline: none;
+      font-size: 14px;
+    }
+    input[type="text"]::placeholder, input[type="number"]::placeholder { color: rgba(255,255,255,0.45); }
+    .btn-send { min-width: 120px; }
+
+    footer {
+      padding: 28px 0 40px;
+      color: rgba(255,255,255,0.55);
+      font-size: 13px;
+    }
+    .fineprint {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.10);
+      color: rgba(255,255,255,0.55);
+      font-size: 13px;
+    }
+
+    @media (max-width: 900px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .grid3 { grid-template-columns: 1fr; }
+      .grid2 { grid-template-columns: 1fr; }
+      .btn-send { min-width: 96px; }
+      .chatbox { height: 300px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="container nav">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>DFW Prebook Parking Helper</div>
+      </div>
+      <nav class="navlinks" aria-label="Primary">
+        <a href="#video">Video</a>
+        <a href="#chatbot">Chatbot</a>
+        <a href="#xfactor">Estimator</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="hero-grid">
+        <div class="card hero-left">
+          <h1>DFW Prebook Parking Helper</h1>
+          <p class="subtitle">
+            Answer two quick questions and get the best official DFW parking option to prebook—based on trip length,
+            proximity, and covered parking.
+          </p>
+
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="page2.html" aria-label="Go to recommendation page">
+              Get My Recommendation →
+            </a>
+            <button class="btn" type="button" onclick="document.querySelector('#chatbot').scrollIntoView({behavior:'smooth'})">
+              Ask the Chatbot
+            </button>
+          </div>
+
+          <div class="pill-row" aria-label="Highlights">
+            <span class="pill"><span class="dot"></span> Simple questions</span>
+            <span class="pill"><span class="dot purple"></span> Clear parking pick</span>
+            <span class="pill"><span class="dot green"></span> Prebook CTA</span>
+          </div>
+        </div>
+
+        <div class="card hero-right">
+          <div class="mini">
+            <h3>Quick & traveler-friendly</h3>
+            <p>No spreadsheets. No guesswork. Just a recommendation you can use in seconds.</p>
+          </div>
+          <div class="mini">
+            <h3>Official options only</h3>
+            <p>We focus on official DFW parking choices so you can prebook with confidence.</p>
+          </div>
+          <div class="mini">
+            <h3>Smart priorities</h3>
+            <p>Pick what matters most—cheapest, closest, or covered—and we’ll tailor the suggestion.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="video">
+      <div class="video-card">
+        <h2 class="section-title">A quick look at “stress-free parking”</h2>
+        <div class="video-wrap">
+          <!-- REQUIRED: autoplay + muted + loop + playsinline -->
+          <video src="video.mp4" autoplay muted loop playsinline preload="auto"></video>
+        </div>
+        <p class="caption">If you’re on mobile, autoplay typically requires the video to be muted (it is).</p>
+      </div>
+    </section>
+
+    <section id="chatbot">
+      <div class="chat-card">
+        <div class="chat-top">
+          <h2 class="section-title" style="margin:0;">Chatbot</h2>
+          <div class="hint">Two questions → one recommendation.</div>
+        </div>
+
+        <div id="chatbox" class="chatbox" aria-live="polite" aria-label="Chat messages"></div>
+
+        <div class="chat-input">
+          <input id="chatInput" type="text" placeholder="Type here… (e.g., 4 days)" autocomplete="off" />
+          <button class="btn btn-send btn-primary" id="sendBtn" type="button">Send</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="how">
+      <h2 class="section-title">How it works</h2>
+      <div class="grid3">
+        <div class="tile">
+          <h4>1) Tell us your trip length</h4>
+          <p>Short trip or long trip—this helps narrow the best parking “fit.”</p>
+        </div>
+        <div class="tile">
+          <h4>2) Pick your priority</h4>
+          <p>Cheapest, closest, or covered. You choose what matters most.</p>
+        </div>
+        <div class="tile">
+          <h4>3) Prebook with confidence</h4>
+          <p>Get a clear recommendation and lock in your spot before you arrive.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="section-title">Why prebook?</h2>
+      <div class="grid3">
+        <div class="tile">
+          <h4>More certainty</h4>
+          <p>Know where you’re going before you even leave home.</p>
+        </div>
+        <div class="tile">
+          <h4>Less stress</h4>
+          <p>Skip last-minute searching, especially during busy travel peaks.</p>
+        </div>
+        <div class="tile">
+          <h4>Faster start to your trip</h4>
+          <p>Park, go, and get to the terminal with fewer surprises.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="xfactor">
+      <h2 class="section-title">X-Factor Feature: Trip Cost Estimator</h2>
+
+      <div class="tile">
+        <p style="margin-top:0; color: var(--muted);">
+          Quick estimate (illustrative) to help you choose confidently and prebook.
+        </p>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px;">
+          <div>
+            <label style="display:block; font-size:13px; color: var(--muted2); margin-bottom:6px;">Trip length (days)</label>
+            <input id="xfDays" type="number" min="1" placeholder="e.g., 4" />
+          </div>
+
+          <div>
+            <label style="display:block; font-size:13px; color: var(--muted2); margin-bottom:6px;">Priority</label>
+            <select id="xfPriority">
+              <option value="cheapest">Cheapest</option>
+              <option value="closest">Closest</option>
+              <option value="covered">Covered</option>
+            </select>
+          </div>
+
+          <div style="display:flex; align-items:end;">
+            <button class="btn btn-primary" type="button" onclick="runEstimator()" style="width:100%;">Estimate & Recommend</button>
+          </div>
+        </div>
+
+        <div id="xfResults" style="display:none; margin-top:14px;">
+          <div class="tile" style="background: rgba(255,255,255,0.05);">
+            <h4 style="margin:0 0 8px;">Estimated cost (simple range)</h4>
+            <div id="xfCosts" style="color: var(--muted); font-size:14px; line-height:1.6;"></div>
+            <div id="xfPick" style="margin-top:10px; font-weight:700;"></div>
+            <button class="btn" type="button" style="margin-top:12px;" onclick="copyPlan()">Copy my parking plan</button>
+          </div>
+        </div>
+
+        <div class="fineprint">
+          X-Factor (under 50 words): This estimator turns trip length + priority into an instant cost comparison and a best-fit recommendation. It helps travelers see the value of prebooking (especially for longer trips) and makes the decision feel clear, fast, and confident.
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="section-title">Traveler tips</h2>
+      <div class="tile">
+        <ul style="margin:0; padding-left: 18px; color: var(--muted);">
+          <li>Build in buffer time for peak mornings and holiday weekends.</li>
+          <li>If weather looks bad, covered or closer options can save time (and stress).</li>
+          <li>If you’re traveling longer, cheaper options may be your best value.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="faq">
+      <h2 class="section-title">FAQ</h2>
+      <div class="grid2">
+        <div class="tile">
+          <h4>Is this an official DFW site?</h4>
+          <p>This is a class project demo. It recommends official-style options for learning purposes.</p>
+        </div>
+        <div class="tile">
+          <h4>What if I need the closest option?</h4>
+          <p>Choose “closest” in the chatbot and it will recommend a premium/near-terminal option.</p>
+        </div>
+        <div class="tile">
+          <h4>Can I run the chatbot again?</h4>
+          <p>Yes—type “restart” after you receive your recommendation.</p>
+        </div>
+        <div class="tile">
+          <h4>Are the costs official?</h4>
+          <p>No—costs are illustrative for class. The goal is to show decision support + prebook value.</p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div>DFW Prebook Parking Helper — class project website (Lab 5).</div>
+      <div class="fineprint">
+        Place <strong>video.mp4</strong> in the same folder as <strong>index.html</strong>.
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    // Chatbot logic (no external APIs)
+    const chatbox = document.getElementById("chatbox");
+    const input = document.getElementById("chatInput");
+    const sendBtn = document.getElementById("sendBtn");
+
+    const state = { step: 0, days: null, priority: null };
+
+    function addMessage(text, who = "bot") {
+      const div = document.createElement("div");
+      div.className = `msg ${who === "bot" ? "bot" : "you"}`;
+      div.textContent = text;
+      chatbox.appendChild(div);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    function normalizePriority(s) {
+      const t = (s || "").trim().toLowerCase();
+      if (t.includes("cheap")) return "cheapest";
+      if (t.includes("close")) return "closest";
+      if (t.includes("cover")) return "covered";
+      return null;
+    }
+
+    function recommend(days, priority) {
+      let pick = "";
+      let why = "";
+
+      if (priority === "closest") {
+        pick = "Terminal Garage";
+        why = "You picked closest, so staying near the terminal is the priority.";
+      } else if (priority === "covered") {
+        pick = "Terminal Garage";
+        why = "Covered parking is easiest with a near-terminal garage-style option.";
+      } else if (priority === "cheapest") {
+        pick = "Remote North/South";
+        why = "You picked cheapest, so a remote lot gives the best value.";
+      } else {
+        pick = "Express North/South";
+        why = "This is a good balanced option for most trips.";
+      }
+
+      if (days >= 7 && priority !== "closest") {
+        pick = "Remote North/South";
+        why = "For a longer trip, a value option typically makes the most sense.";
+      } else if (days <= 2 && priority === "closest") {
+        pick = "Valet";
+        why = "For a short trip + closest, valet is the quickest in-and-out choice.";
+      }
+
+      return { pick, why };
+    }
+
+    function botPrompt() {
+      if (state.step === 0) {
+        addMessage("Hi! I can help you pick the best official DFW parking option to prebook.");
+        addMessage("First question: How many days are you traveling?");
+      } else if (state.step === 1) {
+        addMessage("Great — second question: What matters most: cheapest, closest, or covered?");
+      }
+    }
+
+    function handleUserMessage() {
+      const text = input.value.trim();
+      if (!text) return;
+
+      addMessage(text, "you");
+      input.value = "";
+
+      if (state.step === 0) {
+        const days = Number(text.replace(/[^\d.]/g, ""));
+        if (!Number.isFinite(days) || days <= 0) {
+          addMessage("Quick check: please enter the number of days as a number (for example: 3).");
+          return;
+        }
+        state.days = Math.round(days);
+        state.step = 1;
+        botPrompt();
+        return;
+      }
+
+      if (state.step === 1) {
+        const p = normalizePriority(text);
+        if (!p) {
+          addMessage("I didn’t catch that. Please type one of these: cheapest, closest, or covered.");
+          return;
+        }
+        state.priority = p;
+        state.step = 2;
+
+        const { pick, why } = recommend(state.days, state.priority);
+        addMessage(`Recommendation: ${pick}`);
+        addMessage(`Why: ${why}`);
+        addMessage("Prebook now to lock in your spot. ✅");
+        addMessage("Want to try again? Type “restart”.");
+        return;
+      }
+
+      if (state.step === 2) {
+        if (text.toLowerCase().includes("restart")) {
+          state.step = 0;
+          state.days = null;
+          state.priority = null;
+          addMessage("Done — let’s restart.");
+          botPrompt();
+        } else {
+          addMessage('Tip: type “restart” to run the two questions again.');
+        }
+      }
+    }
+
+    sendBtn.addEventListener("click", handleUserMessage);
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter") handleUserMessage(); });
+
+    botPrompt();
+
+    // X-Factor: Trip Cost Estimator (illustrative pricing)
+    function formatUSD(n){ return "$" + n.toFixed(0); }
+
+    function runEstimator() {
+      const days = Number(document.getElementById("xfDays").value);
+      const priority = document.getElementById("xfPriority").value;
+
+      if (!Number.isFinite(days) || days <= 0) {
+        alert("Please enter a valid number of days (e.g., 4).");
+        return;
+      }
+
+      // Illustrative daily ranges (not official)
+      const rates = {
+        remote: { low: 12, high: 18 },
+        express: { low: 18, high: 24 },
+        terminal: { low: 25, high: 35 },
+        valet: { low: 40, high: 55 }
+      };
+
+      const cost = (r) => ({ low: r.low * days, high: r.high * days });
+
+      const remote = cost(rates.remote);
+      const express = cost(rates.express);
+      const terminal = cost(rates.terminal);
+      const valet = cost(rates.valet);
+
+      let pick = "Express North/South (balanced)";
+      if (priority === "cheapest") pick = "Remote North/South (best value)";
+      if (priority === "closest") pick = days <= 2 ? "Valet (fastest in/out)" : "Terminal Garage (closest)";
+      if (priority === "covered") pick = "Terminal Garage (covered + near terminal)";
+      if (days >= 7 && priority !== "closest") pick = "Remote North/South (best value for longer trips)";
+
+      const costsHtml = `
+        • Remote: ${formatUSD(remote.low)}–${formatUSD(remote.high)} total<br/>
+        • Express: ${formatUSD(express.low)}–${formatUSD(express.high)} total<br/>
+        • Terminal Garage: ${formatUSD(terminal.low)}–${formatUSD(terminal.high)} total<br/>
+        • Valet: ${formatUSD(valet.low)}–${formatUSD(valet.high)} total
+      `;
+
+      document.getElementById("xfCosts").innerHTML = costsHtml;
+      document.getElementById("xfPick").textContent = `Best-fit suggestion: ${pick} — Prebook now to lock it in. ✅`;
+      document.getElementById("xfResults").style.display = "block";
+
+      window._xfPlan = { days, priority, pick };
+    }
+
+    function copyPlan() {
+      if (!window._xfPlan) return;
+      const p = window._xfPlan;
+
+      const text =
+`DFW Prebook Parking Helper Plan
+Trip length: ${p.days} day(s)
+Priority: ${p.priority}
+Recommendation: ${p.pick}
+Next step: Prebook now to lock in your spot.`;
+
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Copied! Paste it into Notes or email.");
+      }).catch(() => {
+        alert("Copy failed (browser blocked it). You can manually select text from the page instead.");
+      });
+    }
+  </script>
+</body>
+</html>
