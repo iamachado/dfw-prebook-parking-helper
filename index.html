@@ -549,6 +549,7 @@
 
     function normalizePriority(s) {
       const t = (s || "").trim().toLowerCase();
+      if (t.includes("convenient") || t.includes("valet")) return "convenient";
       if (t.includes("cheap")) return "cheapest";
       if (t.includes("close")) return "closest";
       if (t.includes("cover")) return "covered";
@@ -559,12 +560,15 @@
       let pick = "";
       let why = "";
 
-      if (priority === "closest") {
+      if (priority === "convenient") {
+        pick = "Valet";
+        why = "You picked most convenient, so valet offers the easiest in-and-out experience.";
+      } else if (priority === "closest") {
         pick = "Terminal Garage";
-        why = "You picked closest, so staying near the terminal is the priority.";
+        why = "You picked closest, so parking near the terminal is the priority.";
       } else if (priority === "covered") {
-        pick = "Terminal Garage";
-        why = "Covered parking is easiest with a near-terminal garage-style option.";
+        pick = "Express North/South";
+        why = "You picked covered, so Express offers a covered-style option with good access.";
       } else if (priority === "cheapest") {
         pick = "Remote North/South";
         why = "You picked cheapest, so a remote lot gives the best value.";
@@ -589,7 +593,7 @@
         addMessage("Hi! I can help you pick the best official DFW parking option to prebook.");
         addMessage("First question: How many days are you traveling?");
       } else if (state.step === 1) {
-        addMessage("Great — second question: What matters most: cheapest, closest, or covered?");
+        addMessage("Great — second question: What matters most: most convenient, closest, covered, or cheapest?");
       }
     }
 
@@ -615,7 +619,7 @@
       if (state.step === 1) {
         const p = normalizePriority(text);
         if (!p) {
-          addMessage("I didn’t catch that. Please type one of these: cheapest, closest, or covered.");
+          addMessage("I didn’t catch that. Please type one of these: most convenient, closest, covered, or cheapest.");
           return;
         }
         state.priority = p;
