@@ -362,7 +362,7 @@
           <div class="pill-row" aria-label="Highlights">
             <span class="pill"><span class="dot"></span> Simple questions</span>
             <span class="pill"><span class="dot purple"></span> Clear parking pick</span>
-            <span class="pill"><span class="dot green"></span> Prebook CTA</span>
+            <span class="pill"><span class="dot green"></span> Easy prebooking </span>
           </div>
         </div>
 
@@ -390,7 +390,7 @@
           <!-- REQUIRED: autoplay + muted + loop + playsinline -->
           <video src="video.mp4" autoplay muted loop playsinline preload="auto"></video>
         </div>
-        <p class="caption">If you’re on mobile, autoplay typically requires the video to be muted (it is).</p>
+        <p class="caption">A quick visual of the traveler journey from parking to terminal.</p>
       </div>
     </section>
 
@@ -451,7 +451,7 @@
 
       <div class="tile">
         <p style="margin-top:0; color: var(--muted);">
-          Quick estimate (illustrative) to help you choose confidently and prebook.
+          Choose what matters most (convenience, closest, covered, or price) and get a quick estimate + recommendation.
         </p>
 
         <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px;">
@@ -463,9 +463,10 @@
           <div>
             <label style="display:block; font-size:13px; color: var(--muted2); margin-bottom:6px;">Priority</label>
             <select id="xfPriority">
-              <option value="cheapest">Cheapest</option>
-              <option value="closest">Closest</option>
-              <option value="covered">Covered</option>
+              <option value="convenient">Most convenient (Valet)</option>
+              <option value="closest">Closest (Terminal Garage)</option>
+              <option value="covered">Covered (Express)</option>
+              <option value="cheapest">Cheapest (Remote)</option>
             </select>
           </div>
 
@@ -484,7 +485,7 @@
         </div>
 
         <div class="fineprint">
-          X-Factor (under 50 words): This estimator turns trip length + priority into an instant cost comparison and a best-fit recommendation. It helps travelers see the value of prebooking (especially for longer trips) and makes the decision feel clear, fast, and confident.
+          Enter your trip length and what matters most to see a quick cost comparison and a best-fit parking suggestion so you can prebook confidently and avoid last minute stress.
         </div>
       </div>
     </section>
@@ -646,7 +647,7 @@
 
     botPrompt();
 
-    // X-Factor: Trip Cost Estimator (illustrative pricing)
+    // Trip Cost Estimator (illustrative pricing)
     function formatUSD(n){ return "$" + n.toFixed(0); }
 
     function runEstimator() {
@@ -674,10 +675,11 @@
       const valet = cost(rates.valet);
 
       let pick = "Express North/South (balanced)";
-      if (priority === "cheapest") pick = "Remote North/South (best value)";
-      if (priority === "closest") pick = days <= 2 ? "Valet (fastest in/out)" : "Terminal Garage (closest)";
-      if (priority === "covered") pick = "Terminal Garage (covered + near terminal)";
-      if (days >= 7 && priority !== "closest") pick = "Remote North/South (best value for longer trips)";
+      if (priority === "convenient") pick = "Valet (most convenient)";
+      if (priority === "closest") pick = "Terminal Garage (closest)";
+      if (priority === "covered") pick = "Express North/South (covered)";
+      if (priority === "cheapest") pick = "Remote North/South (cheapest)";
+      if (days >= 7 && priority === "cheapest") pick = "Remote North/South (cheapest for longer trips)";
 
       const costsHtml = `
         • Remote: ${formatUSD(remote.low)}–${formatUSD(remote.high)} total<br/>
