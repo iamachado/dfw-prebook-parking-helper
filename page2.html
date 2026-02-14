@@ -197,7 +197,7 @@
       <p class="lead">
         This page helps you decide before you arrive at DFW, so parking feels simple instead of stressful.
         Use the chatbot below to get a recommendation based on your trip length and what you care about most.
-        Once you have your pick, the goal is simple: <strong>prebook your spot so your trip starts smoother.</strong>
+        Once you have your pick, the goal is simple: <strong>prebook your spot so your trip starts smoothly.</strong>
       </p>
 
       <div class="grid">
@@ -256,6 +256,10 @@
 
     function normalizePriority(s) {
       const t = (s || "").trim().toLowerCase();
+
+      // Accept convenience / convenient / conveniently + valet
+      if (t.includes("convenien") || t.includes("valet")) return "convenient";
+
       if (t.includes("cheap")) return "cheapest";
       if (t.includes("close")) return "closest";
       if (t.includes("cover")) return "covered";
@@ -266,19 +270,23 @@
       let pick = "";
       let why = "";
 
-      if (priority === "closest") {
+      if (priority === "convenient") {
+        pick = "Valet";
+        why = "You chose most convenient, so valet offers the easiest in-and-out experience.";
+      } else if (priority === "closest") {
         pick = "Terminal Garage";
-        why = "You picked closest, so near-terminal parking is the priority.";
+        why = "You chose closest, so parking near the terminal is the priority.";
       } else if (priority === "covered") {
-        pick = "Terminal Garage";
-        why = "Covered parking is easiest with a near-terminal garage-style option.";
+        pick = "Express North/South";
+        why = "You chose covered, so Express provides a covered-style option with good access.";
       } else if (priority === "cheapest") {
         pick = "Remote North/South";
-        why = "You picked cheapest, so a remote lot gives the best value.";
+        why = "You chose cheapest, so a remote lot gives the best value.";
       } else {
         pick = "Express North/South";
         why = "This is a good balanced option for most trips.";
       }
+
 
       if (days >= 7 && priority !== "closest") {
         pick = "Remote North/South";
@@ -296,7 +304,7 @@
         addMessage("Hi! Let’s get you the best official DFW parking option to prebook.");
         addMessage("First: How many days are you traveling?");
       } else if (state.step === 1) {
-        addMessage("Thanks! Next: What matters most—cheapest, closest, or covered?");
+        addMessage("Thanks! Next: What matters most—most convenient, closest, covered, or cheapest?");
       }
     }
 
