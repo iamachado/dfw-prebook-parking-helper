@@ -679,10 +679,10 @@
       const valet = cost(rates.valet);
 
       let pick = "Express North/South (balanced)";
-      if (priority === "convenient") pick = "Valet (most convenient)";
-      if (priority === "closest") pick = "Terminal Garage (closest)";
-      if (priority === "covered") pick = "Express North/South (covered)";
-      if (priority === "cheapest") pick = "Remote North/South (cheapest)";
+      if (priority === "convenient") pick = "Valet";
+      if (priority === "closest") pick = "Terminal Garage";
+      if (priority === "covered") pick = "Express North/South";
+      if (priority === "cheapest") pick = "Remote North/South";
       if (days >= 7 && priority === "cheapest") pick = "Remote North/South (cheapest for longer trips)";
 
       const costsHtml = `
