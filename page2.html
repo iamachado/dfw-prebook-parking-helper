@@ -288,14 +288,6 @@
       }
 
 
-      if (days >= 7 && priority !== "closest") {
-        pick = "Remote North/South";
-        why = "For a longer trip, a value option typically makes the most sense.";
-      } else if (days <= 2 && priority === "closest") {
-        pick = "Valet";
-        why = "For a short trip + closest, valet is the quickest in-and-out choice.";
-      }
-
       return { pick, why };
     }
 
