@@ -549,12 +549,18 @@
 
     function normalizePriority(s) {
       const t = (s || "").trim().toLowerCase();
-      if (t.includes("convenient") || t.includes("valet")) return "convenient";
+
+      // Accept multiple ways of saying "most convenient"
+      if (t.includes("convenien") || t.includes("valet")) return "convenient";
+      //            ^ matches convenience / convenient / conveniently
+
       if (t.includes("cheap")) return "cheapest";
       if (t.includes("close")) return "closest";
       if (t.includes("cover")) return "covered";
+
       return null;
     }
+
 
     function recommend(days, priority) {
       let pick = "";
