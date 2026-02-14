@@ -562,27 +562,19 @@
 
       if (priority === "convenient") {
         pick = "Valet";
-        why = "You picked most convenient, so valet offers the easiest in-and-out experience.";
+        why = "You chose most convenient, so valet offers the easiest in-and-out experience.";
       } else if (priority === "closest") {
         pick = "Terminal Garage";
-        why = "You picked closest, so parking near the terminal is the priority.";
+        why = "You chose closest, so parking near the terminal is the priority.";
       } else if (priority === "covered") {
         pick = "Express North/South";
-        why = "You picked covered, so Express offers a covered-style option with good access.";
+        why = "You chose covered, so Express provides a covered-style option with good access.";
       } else if (priority === "cheapest") {
         pick = "Remote North/South";
-        why = "You picked cheapest, so a remote lot gives the best value.";
+        why = "You chose cheapest, so a remote lot gives the best value.";
       } else {
         pick = "Express North/South";
         why = "This is a good balanced option for most trips.";
-      }
-
-      if (days >= 7 && priority !== "closest") {
-        pick = "Remote North/South";
-        why = "For a longer trip, a value option typically makes the most sense.";
-      } else if (days <= 2 && priority === "closest") {
-        pick = "Valet";
-        why = "For a short trip + closest, valet is the quickest in-and-out choice.";
       }
 
       return { pick, why };
